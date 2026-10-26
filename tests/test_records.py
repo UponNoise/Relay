@@ -4,6 +4,24 @@ from test_basic import CLITest
 
 
 class RecordTests(CLITest):
+    def test_task_context_includes_project_decisions_and_events(self):
+        tid, other, sid = self.task(), self.task(), self.session()
+        old = self.call("decision", "add", data=self.data(statement="old", rationale="old",
+                       provenance="agent_proposed"))["data"]["decision_id"]
+        new = self.call("decision", "add", data=self.data(statement="PROJECT RULE", rationale="confirmed",
+                       provenance="user_confirmed", confirmation_reference="synthetic approval", supersedes=old))["data"]["decision_id"]
+        own = self.call("decision", "add", data=self.data(task_id=tid, statement="TASK RULE", rationale="local",
+                       provenance="unverified"))["data"]["decision_id"]
+        self.call("decision", "add", data=self.data(task_id=other, statement="OTHER RULE", rationale="other",
+                  provenance="agent_proposed"))
+        self.call("progress", data=self.data(session_id=sid, content="PROJECT EVENT"))
+        ctx = self.call("context", "--task", tid)["data"]
+        self.assertEqual({x["decision_id"] for x in ctx["collections"]["decisions"]}, {new, own})
+        self.assertTrue(any(x["content"] == "PROJECT EVENT" for x in ctx["collections"]["events"]))
+        handoff = self.call("handoff", "--task", tid)["data"]["prompt"]
+        self.assertIn("PROJECT RULE", handoff)
+        self.assertNotIn("OTHER RULE", handoff)
+
     def test_decisions_and_provenance(self):
         self.call("decision", "add", data=self.data(statement="x", rationale="y", provenance="verified_fact"), code="invalid_input")
         first = self.call("decision", "add", data=self.data(statement="proposal", rationale="small",

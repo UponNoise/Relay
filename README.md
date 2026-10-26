@@ -2,7 +2,7 @@
 
 Relay 是本地优先、离线可用的跨 harness 协作 CLI。Python 3.11+、SQLite、argparse，运行时只使用标准库。
 
-当前里程碑：S1 基础存储、初始化、任务/事件与上下文已实现，后续按 [spec](docs/SPEC.md) 推进。
+当前里程碑：S4 已实现基础协作、一致性、记录/模板、迁移与离线报告，后续按 [spec](docs/SPEC.md) 完成失败矩阵与交付验收。
 
 ## 边界
 

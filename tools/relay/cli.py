@@ -16,6 +16,7 @@ COMMANDS = {
     "event": ("show",),
     "decision": ("add", "list"), "evidence": ("add", "check"), "handoff": None,
     "integration": ("render", "check"), "local": ("show", "set"),
+    "export": None, "import": None, "doctor": None, "report": None,
 }
 WRITES = {"task create", "project update", "progress", "session start", "claim", "release", "recover", "task update", "task accept"}
 WRITES.update({"decision add", "evidence add"})
@@ -37,6 +38,14 @@ def options(parser):
     parser.add_argument("--limit", type=int, default=argparse.SUPPRESS)
     parser.add_argument("--offset", type=int, default=argparse.SUPPRESS)
     parser.add_argument("--harness", choices=("generic", "codex", "claude"), default=argparse.SUPPRESS)
+    parser.add_argument("--kind", choices=("collaboration", "full"), default=argparse.SUPPRESS)
+    parser.add_argument("--output", default=argparse.SUPPRESS)
+    parser.add_argument("--include", action="append", default=argparse.SUPPRESS)
+    parser.add_argument("--exclude", action="append", default=argparse.SUPPRESS)
+    parser.add_argument("--quiesced", action="store_true", default=argparse.SUPPRESS)
+    parser.add_argument("--dry-run", action="store_true", default=argparse.SUPPRESS)
+    parser.add_argument("--archive", default=argparse.SUPPRESS)
+    parser.add_argument("--destination", default=argparse.SUPPRESS)
 
 
 def parser():
@@ -77,8 +86,20 @@ def dispatch(args):
     if command == "integration render":
         from integration import render
         return render(args.harness)
+    if command == "import":
+        from packages import import_package
+        return import_package(args, payload(args))
     store = Store(discover(args.project))
     try:
+        if command == "export":
+            from packages import export_package
+            return export_package(store, args, payload(args))
+        if command == "report":
+            from health import report
+            return report(store, args, payload(args))
+        if command == "doctor":
+            from health import doctor
+            return doctor(store)
         if command == "local set":
             from resources import set_local
             return set_local(store, payload(args))
@@ -99,7 +120,9 @@ def main(argv=None):
     try:
         args = parser().parse_args(argv)
         for k, v in {"project": None, "json": False, "input_file": None, "task": None,
-                     "id": None, "since": None, "limit": 20, "offset": 0, "harness": "generic"}.items():
+                     "id": None, "since": None, "limit": 20, "offset": 0, "harness": "generic",
+                     "kind": "collaboration", "output": None, "include": [], "exclude": [],
+                     "quiesced": False, "dry_run": False, "archive": None, "destination": None}.items():
             if not hasattr(args, k):
                 setattr(args, k, v)
         result = dispatch(args)

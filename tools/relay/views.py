@@ -1,5 +1,6 @@
 """Read-only projections; SQLite remains authoritative."""
 import json
+from datetime import datetime
 
 from common import fail, now
 
@@ -12,6 +13,23 @@ def rowdict(row):
 
 
 def context(store, task=None, since=None, limit=20, offset=0):
+    if since:
+        try:
+            parsed = datetime.fromisoformat(since)
+            if parsed.tzinfo is None:
+                fail("invalid_input", "--since requires a timezone")
+            from datetime import timezone
+            since = parsed.astimezone(timezone.utc).isoformat(timespec="microseconds")
+        except ValueError:
+            fail("invalid_input", "--since must be an ISO timestamp")
+    store.db.execute("BEGIN")
+    try:
+        return _context(store, task, since, limit, offset)
+    finally:
+        store.db.rollback()
+
+
+def _context(store, task=None, since=None, limit=20, offset=0):
     if not 1 <= limit <= 200 or offset < 0:
         fail("invalid_input", "limit must be 1..200; offset must be nonnegative")
     if task:
@@ -20,7 +38,7 @@ def context(store, task=None, since=None, limit=20, offset=0):
     for table in ("tasks", "decisions", "events", "evidence"):
         where, args = [], []
         if task and table in ("tasks", "decisions", "events"):
-            where.append("task_id=?")
+            where.append("task_id=?" if table == "tasks" else "(task_id=? OR task_id IS NULL)")
             args.append(task)
         if not task and table == "tasks":
             where.append("status NOT IN ('done','cancelled')")
