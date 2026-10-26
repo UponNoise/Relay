@@ -3,6 +3,8 @@ from common import EVENT_TYPES, fail, fields, now, require, uid, canonical
 
 
 def add_event(store, data, event_type=None, content=None):
+    from ownership import session
+    source = session(store, data)
     task_id = data.get("task_id")
     if task_id:
         store.get("tasks", "task_id", task_id)
@@ -15,12 +17,17 @@ def add_event(store, data, event_type=None, content=None):
     store.db.execute("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?)",
                      (eid, task_id, event_type or data.get("event_type", "progress"),
                       content if content is not None else data["content"],
-                      store.local.get("environment", "local"), data.get("session_id"),
+                      source["environment"], source["session_id"],
                       now(), canonical(refs), data["request_id"]))
+    store.db.execute("UPDATE sessions SET last_activity=? WHERE session_id=?", (now(), source["session_id"]))
     return eid
 
 
 def mutate(store, command, data):
+    from ownership import OWNER_FIELDS, action_for, update_task
+    action = action_for(store, command, data)
+    if action:
+        return store.write(command, data, action)
     if command == "task create":
         fields(data, ("title", "objective", "acceptance_criteria"), ("title", "objective", "acceptance_criteria"))
 
@@ -45,12 +52,15 @@ def mutate(store, command, data):
             store.db.execute("UPDATE project SET " + ",".join(f"{k}=?" for k in changes), tuple(changes.values()))
             return {"project_id": p["project_id"], "revision": expected + 1}
     elif command == "progress":
-        fields(data, ("task_id", "content", "event_type", "evidence_refs", "session_id"), ("content",))
+        fields(data, ("task_id", "content", "event_type", "evidence_refs", "session_id",
+                      "generation", "expected_revision", *OWNER_FIELDS), ("content", "session_id"))
         if data.get("event_type", "progress") not in EVENT_TYPES[:-1]:
             fail("invalid_input", "Use task accept for acceptance events")
 
         def action():
-            return {"event_id": add_event(store, data)}
+            eid = add_event(store, data)
+            result = update_task(store, data) if any(k in data for k in OWNER_FIELDS) else {}
+            return {**result, "event_id": eid}
     else:
         fail("invalid_input", "Unknown modification", command=command)
     return store.write(command, data, action)

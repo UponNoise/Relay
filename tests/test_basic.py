@@ -46,6 +46,9 @@ class CLITest(unittest.TestCase):
         return self.call("task", "create", data=self.data(
             title="合成任务", objective="实现示例", acceptance_criteria="测试通过"))["data"]["task_id"]
 
+    def session(self):
+        return self.call("session", "start", data=self.data(environment="test-harness"))["data"]["session_id"]
+
 
 class BasicTests(CLITest):
     def test_init_replay_and_refuse_overwrite(self):
@@ -54,7 +57,7 @@ class BasicTests(CLITest):
 
     def test_task_event_context(self):
         tid = self.task()
-        e = self.call("progress", data=self.data(task_id=tid, content="第一行\n第二行"))["data"]
+        e = self.call("progress", data=self.data(task_id=tid, session_id=self.session(), content="第一行\n第二行"))["data"]
         self.assertEqual(self.call("event", "show", "--id", e["event_id"])["data"]["content"], "第一行\n第二行")
         ctx = self.call("context")["data"]
         self.assertEqual(ctx["collections"]["tasks"][0]["task_id"], tid)

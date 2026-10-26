@@ -11,10 +11,11 @@ from views import query
 
 COMMANDS = {
     "init": None, "status": None, "context": None, "progress": None,
-    "project": ("show", "update"), "task": ("create", "list", "show"),
+    "project": ("show", "update"), "task": ("create", "list", "show", "update", "accept"),
+    "session": ("start", "show"), "claim": None, "release": None, "recover": None,
     "event": ("show",),
 }
-WRITES = {"task create", "project update", "progress"}
+WRITES = {"task create", "project update", "progress", "session start", "claim", "release", "recover", "task update", "task accept"}
 
 
 class Parser(argparse.ArgumentParser):

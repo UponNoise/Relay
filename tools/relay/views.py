@@ -42,6 +42,8 @@ def context(store, task=None, since=None, limit=20, offset=0):
 
 
 def query(store, command, args):
+    if command == "session show":
+        return store.get("sessions", "session_id", args.id)
     if command == "project show":
         return store.project()
     if command == "task show":
