@@ -14,8 +14,11 @@ COMMANDS = {
     "project": ("show", "update"), "task": ("create", "list", "show", "update", "accept"),
     "session": ("start", "show"), "claim": None, "release": None, "recover": None,
     "event": ("show",),
+    "decision": ("add", "list"), "evidence": ("add", "check"), "handoff": None,
+    "integration": ("render", "check"), "local": ("show", "set"),
 }
 WRITES = {"task create", "project update", "progress", "session start", "claim", "release", "recover", "task update", "task accept"}
+WRITES.update({"decision add", "evidence add"})
 
 
 class Parser(argparse.ArgumentParser):
@@ -33,6 +36,7 @@ def options(parser):
     parser.add_argument("--since", default=argparse.SUPPRESS, help="ISO timestamp lower bound")
     parser.add_argument("--limit", type=int, default=argparse.SUPPRESS)
     parser.add_argument("--offset", type=int, default=argparse.SUPPRESS)
+    parser.add_argument("--harness", choices=("generic", "codex", "claude"), default=argparse.SUPPRESS)
 
 
 def parser():
@@ -70,8 +74,14 @@ def dispatch(args):
     command = args.command + (" " + args.subcommand if getattr(args, "subcommand", None) else "")
     if command == "init":
         return initialize(args.project or ".", payload(args))
+    if command == "integration render":
+        from integration import render
+        return render(args.harness)
     store = Store(discover(args.project))
     try:
+        if command == "local set":
+            from resources import set_local
+            return set_local(store, payload(args))
         if command in WRITES:
             return mutate(store, command, payload(args))
         return query(store, command, args)
@@ -89,7 +99,7 @@ def main(argv=None):
     try:
         args = parser().parse_args(argv)
         for k, v in {"project": None, "json": False, "input_file": None, "task": None,
-                     "id": None, "since": None, "limit": 20, "offset": 0}.items():
+                     "id": None, "since": None, "limit": 20, "offset": 0, "harness": "generic"}.items():
             if not hasattr(args, k):
                 setattr(args, k, v)
         result = dispatch(args)

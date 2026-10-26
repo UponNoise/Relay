@@ -25,7 +25,10 @@ def add_event(store, data, event_type=None, content=None):
 
 def mutate(store, command, data):
     from ownership import OWNER_FIELDS, action_for, update_task
+    from records import action_for as records_action
     action = action_for(store, command, data)
+    if action is None:
+        action = records_action(store, command, data)
     if action:
         return store.write(command, data, action)
     if command == "task create":

@@ -23,6 +23,8 @@ SQLite foreign_keys=ON；journal_mode=WAL（仅本地磁盘）；busy_timeout=25
 请求规范化为排序 JSON（去除 request_id），命令名参与摘要；同 ID 同输入返回原结果，
 异输入返回 duplicate_request_mismatch。init/local/export/import 使用可回读的操作结果；
 业务防重以数据库为准，文件操作另记可验证操作标识。
+本机配置的请求收据仅保存在 local.json（实例作用域），避免把机器路径写入可迁移业务数据库；
+本机配置更新采用独占短锁和原子替换，不构建数据库与文件系统的分布式事务。
 
 任务摘要/公共字段修改要求 expected_revision 以及当前 session_id/generation；
 非负责人仅可追加事件。成功返回对象 ID、revision、request_id。
