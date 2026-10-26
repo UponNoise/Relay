@@ -89,6 +89,12 @@ def query(store, command, args):
                   + "项目 ID：" + ctx["project"]["project_id"] + "\n本机根目录：" + str(store.root)
                   + "\n路径以目标电脑实际根目录为准。不要重复初始化或创建已有任务。\n"
                   + "先读 .relay/PROTOCOL.md，运行 python tools/relay context --json。\n"
+                  + '写入用 --input-file FILE（UTF-8 JSON）或 --input-file -（stdin）；每次新操作用新 request_id，重试沿用原 ID 与输入。\n'
+                  + '会话示例：python tools/relay session start --input-file session.json --json；JSON: {"request_id":"NEW_UUID","environment":"YOUR_ENV"}。\n'
+                  + '领取示例：python tools/relay claim --input-file claim.json --json；JSON: {"request_id":"NEW_UUID","task_id":"EXISTING_TASK_ID","session_id":"RETURNED_SESSION_ID"}。\n'
+                  + '写结果用 python tools/relay progress --input-file progress.json --json；JSON 含 request_id、task_id、session_id、content、evidence_refs。\n'
+                  + '同时改摘要需 generation（领取返回值）、expected_revision（task show 返回值）、current_summary、next_step、blocker 和 status。\n'
+                  + '状态 todo/in_progress/blocked/awaiting_review；不要直接写 done。未持有任务只追加事件；claim_conflict 时先沟通，禁止绕过分工。\n'
                   + "创建自己的 session start；读取 task show 后 claim，已有负责人则沟通或显式 recover 并说明原因。\n"
                   + "先读后写，progress 记录结果/证据/下一步；按返回 ID 回读；交付 awaiting_review，用户明确确认后 accept。\n"
                   + json.dumps(ctx, ensure_ascii=False, indent=2))

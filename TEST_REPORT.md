@@ -12,4 +12,26 @@ S4：同一测试命令共 22 项通过；两类包、显式文件选择/排除�
 S5：完整回归 30 项通过；随后补充 manifest 缺 export_id 用例，失败矩阵 9 项全部通过（共 31 项用例）。覆盖独立进程、锁超时、原请求重试、原子回滚、打包期间文件变化、原始 ZIP 路径/别名/符号链接、DB 身份与外键损坏、输入文件及时间过滤。
 Windows ZIP 名称规范化曾使非法路径落入错误类别，已改为先校验 orig_filename；父线程发现缺少 manifest 身份字段出现 KeyError，已显式校验并补回归。
 父线程另在 S4 commit 986d6f0 上独立 Linux 复验 22/22 通过。
-真实第二 harness、新会话加载和跨电脑尚未运行。
+S6：Windows / Python 3.12.0 完整运行 `python -m unittest discover -s tests -v`，31/31 通过。
+父线程在 S5 commit 35e3ba20f296dcc250ab0b1a4e47a0000b64c116 的独立 Linux / Python 3.12.14 环境运行同一套测试，31/31 通过。此证据不等于真实第二 harness 或跨电脑恢复。
+
+## 实际 CLI 演示
+
+`python scripts/demo.py --output exports/demo-final` 通过真实短进程完成：A 创建会话/领取/记录/释放，B 读取/创建会话/领取/结果/待验收，合成显式验收、生成交接和 HTML、完整包清单/导出、新目录恢复及使用恢复后 CLI 执行 doctor。
+初次演示在 Windows 发现示例文本 CRLF 与内存 LF 的摘要差异，改为计算实际文件字节后通过；这是示例修复，迁移校验正确识别了差异。
+当前 Codex 会话直接执行过 `python tools/relay --help`、合成项目 status、恢复项目 doctor --json 和 integration check --harness codex --json。
+源码包从审查后的 Git index 构建；输出到 dist，附 SHA256 文件。解压后复验命令为 `python tools/relay --help` 与 `python -m unittest discover -s tests -v`。
+
+## 验收分层
+
+| 层级 | 结果与证据 |
+|---|---|
+| 自动化行为测试 | Windows 当前版本 31 项通过；Linux S5 31 项由父线程独立通过 |
+| 两个独立 CLI 进程 | 竞争测试恰一成功；合成 A/B 接力演示通过 |
+| 当前 Codex harness 调用 | 本会话直接运行 help/status/doctor/integration check 通过 |
+| 第二真实 harness | 未运行；已提供 Claude/Codex/通用模板和人工步骤 |
+| 新会话自动加载 | 未验证；integration check 明确返回 automatic_loading_verified=false |
+| 跨电脑恢复 | 未运行；同机新目录恢复通过，不冒充换机验收 |
+
+当前无已知阻断基础功能的问题。无 CI 配置，远端通过阶段 SHA 核验；没有发布软件包。
+公开样例仅合成内容，交接根路径替换为占位符。真实运行 DB、日志、本机路径配置和原始附件不提交。

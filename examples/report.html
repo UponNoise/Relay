@@ -1,0 +1,135 @@
+<!-- relay-receipt:{"marker":"5a1bb9cb26e7766f4990f27526749221513d78061f71b6b3fc5ab602889cd2cc","result":{"project_id":"375a1781\u002d85e1\u002d484c\u002d8cdb\u002d292dd28fe6ed","request_id":"ee559418\u002d0673\u002d49a0\u002db93b\u002de9cd380dcd58","revision":13}}-->
+<!doctype html><html lang='zh-CN'><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'><title>Relay 项目快照</title>
+<style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 24px;color:#182c39;background:#f4f7fa}h1,h2{color:#12465d}article{background:white;padding:18px;margin:12px 0;border:1px solid #d4dfe5;border-radius:8px}pre{white-space:pre-wrap;overflow-wrap:anywhere}small{color:#536874}</style><h1>Relay 项目快照</h1>
+<small>生成时间 2026-10-26T09:08:55.843300+00:00 · revision 13</small>
+<h2>项目</h2><pre>{
+  &quot;project_id&quot;: &quot;375a1781-85e1-484c-8cdb-292dd28fe6ed&quot;,
+  &quot;name&quot;: &quot;合成接力示例&quot;,
+  &quot;goal&quot;: &quot;由两个 CLI 会话接力生成示例成果&quot;,
+  &quot;scope&quot;: &quot;仅合成数据，不代表真实 harness 集成验收&quot;,
+  &quot;working_agreements&quot;: &quot;先读后写、领取、证据、回读、显式验收&quot;,
+  &quot;acceptance_policy&quot;: &quot;用户明确确认&quot;,
+  &quot;schema_version&quot;: 1,
+  &quot;revision&quot;: 13,
+  &quot;created_at&quot;: &quot;2026-10-26T09:08:52.457404+00:00&quot;,
+  &quot;updated_at&quot;: &quot;2026-10-26T09:08:55.460791+00:00&quot;
+}</pre>
+<h2>任务</h2>
+<article><pre>{
+  &quot;task_id&quot;: &quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9&quot;,
+  &quot;project_id&quot;: &quot;375a1781-85e1-484c-8cdb-292dd28fe6ed&quot;,
+  &quot;title&quot;: &quot;制作示例成果&quot;,
+  &quot;objective&quot;: &quot;完成一份可校验文本&quot;,
+  &quot;acceptance_criteria&quot;: &quot;文本内容完整，SHA256 可核验，交接可续接&quot;,
+  &quot;status&quot;: &quot;done&quot;,
+  &quot;current_summary&quot;: &quot;成果已生成并通过 SHA256 检查&quot;,
+  &quot;next_step&quot;: &quot;等待显式验收&quot;,
+  &quot;blocker&quot;: &quot;&quot;,
+  &quot;revision&quot;: 4,
+  &quot;created_at&quot;: &quot;2026-10-26T09:08:52.775572+00:00&quot;,
+  &quot;updated_at&quot;: &quot;2026-10-26T09:08:55.459792+00:00&quot;
+}</pre></article>
+<h2>决策</h2>
+<article><pre>{
+  &quot;decision_id&quot;: &quot;da76f991-9512-4a11-bdd4-fd0783bd3c1e&quot;,
+  &quot;project_id&quot;: &quot;375a1781-85e1-484c-8cdb-292dd28fe6ed&quot;,
+  &quot;task_id&quot;: null,
+  &quot;statement&quot;: &quot;示例只使用合成内容&quot;,
+  &quot;rationale&quot;: &quot;避免真实信息进入示例&quot;,
+  &quot;provenance&quot;: &quot;verified_fact&quot;,
+  &quot;confirmation_reference&quot;: &quot;{\&quot;confirmation_reference\&quot;:\&quot;\&quot;,\&quot;evidence_refs\&quot;:[],\&quot;verification_method\&quot;:\&quot;本脚本使用固定合成字符串\&quot;}&quot;,
+  &quot;supersedes&quot;: null,
+  &quot;created_at&quot;: &quot;2026-10-26T09:08:53.532884+00:00&quot;
+}</pre></article>
+<h2>事件</h2>
+<article><pre>{
+  &quot;event_id&quot;: &quot;95d139c9-c2a5-4804-b462-d8f28871b79a&quot;,
+  &quot;task_id&quot;: &quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9&quot;,
+  &quot;event_type&quot;: &quot;handoff&quot;,
+  &quot;content&quot;: &quot;{\&quot;generation\&quot;:1,\&quot;operation\&quot;:\&quot;claim\&quot;,\&quot;previous_claim\&quot;:null,\&quot;reason\&quot;:\&quot;\&quot;,\&quot;session_id\&quot;:\&quot;8bc58b3d-970c-4d7f-986b-5543567dab71\&quot;}&quot;,
+  &quot;source_environment&quot;: &quot;demo-cli-A&quot;,
+  &quot;session_id&quot;: &quot;8bc58b3d-970c-4d7f-986b-5543567dab71&quot;,
+  &quot;recorded_at&quot;: &quot;2026-10-26T09:08:53.154580+00:00&quot;,
+  &quot;evidence_refs&quot;: [],
+  &quot;request_id&quot;: &quot;99671434-a2a8-48dd-9ee8-9e634e948c6e&quot;
+}</pre></article>
+<article><pre>{
+  &quot;event_id&quot;: &quot;68d2360f-6efe-4966-a1f5-8c5bcc3a3a68&quot;,
+  &quot;task_id&quot;: &quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9&quot;,
+  &quot;event_type&quot;: &quot;progress&quot;,
+  &quot;content&quot;: &quot;A 完成第一部分&quot;,
+  &quot;source_environment&quot;: &quot;demo-cli-A&quot;,
+  &quot;session_id&quot;: &quot;8bc58b3d-970c-4d7f-986b-5543567dab71&quot;,
+  &quot;recorded_at&quot;: &quot;2026-10-26T09:08:53.342757+00:00&quot;,
+  &quot;evidence_refs&quot;: [],
+  &quot;request_id&quot;: &quot;829a27c3-195e-4d3c-b589-77daa5b0a790&quot;
+}</pre></article>
+<article><pre>{
+  &quot;event_id&quot;: &quot;705ae140-8f26-4c6e-a2d7-362924b9b854&quot;,
+  &quot;task_id&quot;: &quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9&quot;,
+  &quot;event_type&quot;: &quot;handoff&quot;,
+  &quot;content&quot;: &quot;{\&quot;generation\&quot;:2,\&quot;operation\&quot;:\&quot;release\&quot;,\&quot;previous_claim\&quot;:{\&quot;generation\&quot;:1,\&quot;session_id\&quot;:\&quot;8bc58b3d-970c-4d7f-986b-5543567dab71\&quot;,\&quot;task_id\&quot;:\&quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9\&quot;,\&quot;updated_at\&quot;:\&quot;2026-10-26T09:08:53.342757+00:00\&quot;},\&quot;reason\&quot;:\&quot;\&quot;,\&quot;session_id\&quot;:null}&quot;,
+  &quot;source_environment&quot;: &quot;demo-cli-A&quot;,
+  &quot;session_id&quot;: &quot;8bc58b3d-970c-4d7f-986b-5543567dab71&quot;,
+  &quot;recorded_at&quot;: &quot;2026-10-26T09:08:53.725571+00:00&quot;,
+  &quot;evidence_refs&quot;: [],
+  &quot;request_id&quot;: &quot;3ff08bee-068f-4344-a9ae-989192e0c989&quot;
+}</pre></article>
+<article><pre>{
+  &quot;event_id&quot;: &quot;b8c42a37-d10c-48cc-a7fa-bf4b239ebf70&quot;,
+  &quot;task_id&quot;: &quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9&quot;,
+  &quot;event_type&quot;: &quot;handoff&quot;,
+  &quot;content&quot;: &quot;{\&quot;generation\&quot;:3,\&quot;operation\&quot;:\&quot;claim\&quot;,\&quot;previous_claim\&quot;:{\&quot;generation\&quot;:2,\&quot;session_id\&quot;:null,\&quot;task_id\&quot;:\&quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9\&quot;,\&quot;updated_at\&quot;:\&quot;2026-10-26T09:08:53.725571+00:00\&quot;},\&quot;reason\&quot;:\&quot;\&quot;,\&quot;session_id\&quot;:\&quot;0bd17997-ce4d-442b-9c9e-dbb05f4d5ce8\&quot;}&quot;,
+  &quot;source_environment&quot;: &quot;demo-cli-B&quot;,
+  &quot;session_id&quot;: &quot;0bd17997-ce4d-442b-9c9e-dbb05f4d5ce8&quot;,
+  &quot;recorded_at&quot;: &quot;2026-10-26T09:08:54.496852+00:00&quot;,
+  &quot;evidence_refs&quot;: [],
+  &quot;request_id&quot;: &quot;87dd7b8f-3398-4e5b-9ecc-c0da01cc81d6&quot;
+}</pre></article>
+<article><pre>{
+  &quot;event_id&quot;: &quot;9c5cbca6-21d6-4aae-9013-71760ed204af&quot;,
+  &quot;task_id&quot;: &quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9&quot;,
+  &quot;event_type&quot;: &quot;result&quot;,
+  &quot;content&quot;: &quot;B 已生成成果并核验摘要&quot;,
+  &quot;source_environment&quot;: &quot;demo-cli-B&quot;,
+  &quot;session_id&quot;: &quot;0bd17997-ce4d-442b-9c9e-dbb05f4d5ce8&quot;,
+  &quot;recorded_at&quot;: &quot;2026-10-26T09:08:54.890644+00:00&quot;,
+  &quot;evidence_refs&quot;: [
+    &quot;973f0cb1-d063-4579-be81-7075d14d866a&quot;
+  ],
+  &quot;request_id&quot;: &quot;39c90b27-fb19-44f9-b6b5-dd887cadcf95&quot;
+}</pre></article>
+<article><pre>{
+  &quot;event_id&quot;: &quot;a1441024-87bf-4129-9e44-ba181c56c86a&quot;,
+  &quot;task_id&quot;: &quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9&quot;,
+  &quot;event_type&quot;: &quot;handoff&quot;,
+  &quot;content&quot;: &quot;{\&quot;generation\&quot;:4,\&quot;operation\&quot;:\&quot;release\&quot;,\&quot;previous_claim\&quot;:{\&quot;generation\&quot;:3,\&quot;session_id\&quot;:\&quot;0bd17997-ce4d-442b-9c9e-dbb05f4d5ce8\&quot;,\&quot;task_id\&quot;:\&quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9\&quot;,\&quot;updated_at\&quot;:\&quot;2026-10-26T09:08:54.890644+00:00\&quot;},\&quot;reason\&quot;:\&quot;\&quot;,\&quot;session_id\&quot;:null}&quot;,
+  &quot;source_environment&quot;: &quot;demo-cli-B&quot;,
+  &quot;session_id&quot;: &quot;0bd17997-ce4d-442b-9c9e-dbb05f4d5ce8&quot;,
+  &quot;recorded_at&quot;: &quot;2026-10-26T09:08:55.255070+00:00&quot;,
+  &quot;evidence_refs&quot;: [],
+  &quot;request_id&quot;: &quot;2784df39-d104-4cc3-a4aa-661b8d4d9415&quot;
+}</pre></article>
+<article><pre>{
+  &quot;event_id&quot;: &quot;88bcf7ea-7ae5-461b-81da-99528453ad93&quot;,
+  &quot;task_id&quot;: &quot;72139a8f-ba6a-466e-8202-74ff1ba6bcb9&quot;,
+  &quot;event_type&quot;: &quot;acceptance&quot;,
+  &quot;content&quot;: &quot;{\&quot;confirmation_source\&quot;:\&quot;合成验收夹具；不代表真实用户批准\&quot;,\&quot;note\&quot;:\&quot;固定示例的输出、证据与状态检查通过\&quot;}&quot;,
+  &quot;source_environment&quot;: &quot;demo-cli-B&quot;,
+  &quot;session_id&quot;: &quot;0bd17997-ce4d-442b-9c9e-dbb05f4d5ce8&quot;,
+  &quot;recorded_at&quot;: &quot;2026-10-26T09:08:55.460791+00:00&quot;,
+  &quot;evidence_refs&quot;: [],
+  &quot;request_id&quot;: &quot;9aa2aff2-5766-4dfa-9e4b-1518c2f6eca1&quot;
+}</pre></article>
+<h2>证据</h2>
+<article><pre>{
+  &quot;evidence_id&quot;: &quot;973f0cb1-d063-4579-be81-7075d14d866a&quot;,
+  &quot;kind&quot;: &quot;project_file&quot;,
+  &quot;locator&quot;: &quot;artifacts/result.txt&quot;,
+  &quot;description&quot;: &quot;合成成果&quot;,
+  &quot;digest&quot;: &quot;be8505acc98b4282ee8ee2e9ae5f3bfd2643a104e8b16f1714de38bc5a02094f&quot;,
+  &quot;verification_method&quot;: null,
+  &quot;verified_at&quot;: null
+}</pre></article>
+</html>
