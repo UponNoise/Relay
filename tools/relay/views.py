@@ -53,8 +53,12 @@ def _context(store, task=None, since=None, limit=20, offset=0):
         rows = store.db.execute(sql, (*args, limit + 1, offset)).fetchall()
         result["collections"][table] = [rowdict(r) for r in rows[:limit]]
         result["truncated"][table] = len(rows) > limit
-    result["claims"] = [dict(r) for r in store.db.execute(
-        "SELECT c.*,s.environment,s.last_activity FROM claims c LEFT JOIN sessions s USING(session_id) WHERE c.session_id IS NOT NULL")]
+    claim_rows = store.db.execute(
+        "SELECT c.*,s.environment,s.last_activity FROM claims c LEFT JOIN sessions s USING(session_id) "
+        "WHERE c.session_id IS NOT NULL" + (" AND c.task_id=?" if task else "") +
+        " ORDER BY c.updated_at DESC LIMIT ? OFFSET ?", ((task,) if task else ()) + (limit + 1, offset)).fetchall()
+    result["claims"] = [dict(r) for r in claim_rows[:limit]]
+    result["truncated"]["claims"] = len(claim_rows) > limit
     result["continuation"] = {"next_offset": offset + limit, "instruction": "Use --offset with --limit; task show includes terminal tasks."}
     return result
 
@@ -105,3 +109,34 @@ def query(store, command, args):
     if command in ("context", "status"):
         return context(store, args.task, args.since, args.limit, args.offset)
     fail("invalid_input", "Unknown query", command=command)
+
+
+def human(result):
+    """Compact human output; structured integrations should use --json."""
+    if isinstance(result, dict) and "prompt" in result:
+        return result["prompt"]
+    if isinstance(result, dict) and "snippet" in result:
+        return result["snippet"]
+    if isinstance(result, dict) and "collections" in result:
+        p = result["project"]
+        lines = [f'{p["name"]} · revision {p["revision"]}', f'目标：{p["goal"]}', f'范围：{p["scope"]}',
+                 f'工作约定：{p["working_agreements"]}', f'验收策略：{p["acceptance_policy"]}']
+        holders = {c["task_id"]: c for c in result["claims"]}
+        for task in result["collections"]["tasks"]:
+            h = holders.get(task["task_id"])
+            lines += [f'[{task["status"]}] {task["title"]} ({task["task_id"]})',
+                      f'  负责人：{h["environment"] if h else "未领取/未在当前领取分页"}',
+                      f'  摘要：{task["current_summary"]}', f'  阻塞：{task["blocker"]}', f'  下一步：{task["next_step"]}']
+        for key in ("decisions", "events", "evidence"):
+            lines.append(key + ":")
+            lines += [json.dumps(row, ensure_ascii=False) for row in result["collections"][key]]
+        for claim in result["claims"]:
+            lines.append(f'领取 {claim["task_id"]}: {claim["environment"]} · generation {claim["generation"]} · 最近活动 {claim["last_activity"]}')
+        if any(result["truncated"].values()):
+            lines.append("结果已截断；继续使用 --offset " + str(result["continuation"]["next_offset"]) + " --limit。")
+        return "\n".join(lines)
+    if isinstance(result, list):
+        return "\n".join(json.dumps(x, ensure_ascii=False) for x in result) or "无记录"
+    if isinstance(result, dict):
+        return "\n".join(f"{k}: {json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else v}" for k, v in result.items())
+    return str(result)

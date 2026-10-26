@@ -3,6 +3,7 @@ import argparse
 import json
 import sqlite3
 import sys
+import zipfile
 
 from common import RelayError, VERSION, fail
 from service import mutate
@@ -129,9 +130,10 @@ def main(argv=None):
         if args.json:
             print(json.dumps({"ok": True, "data": result}, ensure_ascii=False))
         else:
-            print(json.dumps(result, ensure_ascii=False, indent=2))
+            from views import human
+            print(human(result))
         return 0
-    except (RelayError, sqlite3.Error, OSError, ValueError) as exc:
+    except (RelayError, sqlite3.Error, OSError, ValueError, zipfile.BadZipFile) as exc:
         if not isinstance(exc, RelayError):
             code = "database_busy" if isinstance(exc, sqlite3.OperationalError) and ("locked" in str(exc) or "busy" in str(exc)) else "integrity_error"
             exc = RelayError(code, str(exc))

@@ -79,7 +79,7 @@ def export_package(store, args, data):
                 manifest = json.loads(z.read("manifest.json"))
         except (ValueError, KeyError, zipfile.BadZipFile):
             fail("invalid_input", "Output already exists; refusing to overwrite")
-        if manifest.get("request_id") != data["request_id"] or manifest.get("request_fingerprint") != fp:
+        if not isinstance(manifest, dict) or manifest.get("request_id") != data["request_id"] or manifest.get("request_fingerprint") != fp:
             fail("invalid_input", "Output already exists; use a new path")
         result = {"export_id": manifest["export_id"], "project_id": manifest["project_id"],
                   "revision": manifest["snapshot_revision"], "sha256": hash_file(output)}
@@ -173,6 +173,9 @@ def validate_archive(archive, staging):
             fail("invalid_input", "Archive exceeds supported limits")
         names, folded = set(), set()
         for info in infos:
+            relative_name(info.orig_filename)
+            if info.orig_filename != info.filename:
+                fail("invalid_input", "Archive member name was normalized")
             relative_name(info.filename)
             if info.is_dir() or stat.S_ISLNK(info.external_attr >> 16):
                 fail("invalid_input", "Directory/link archive members are not supported")
@@ -186,6 +189,11 @@ def validate_archive(archive, staging):
             fail("integrity_error", "Missing or invalid manifest")
         if not isinstance(manifest, dict) or manifest.get("schema_version") != SCHEMA:
             fail("incompatible_version", "Only schema 1 packages are supported")
+        for key in ("export_id", "project_id", "source_instance_id", "tool_version", "created_at"):
+            if not isinstance(manifest.get(key), str) or not manifest[key]:
+                fail("integrity_error", "Missing manifest metadata", field=key)
+        if type(manifest.get("snapshot_revision")) is not int or manifest.get("kind") not in ("full", "collaboration"):
+            fail("integrity_error", "Invalid manifest snapshot metadata")
         if not isinstance(manifest.get("files"), list):
             fail("integrity_error", "Invalid manifest file list")
         expected = {}
@@ -252,6 +260,8 @@ def import_package(args, data):
             if project["project_id"] != manifest.get("project_id") or project["revision"] != manifest.get("snapshot_revision"):
                 fail("integrity_error", "Snapshot identity or revision mismatch")
             store.db.execute("BEGIN IMMEDIATE")
+            if store.db.execute("SELECT 1 FROM requests WHERE request_id=?", (data["request_id"],)).fetchone():
+                fail("duplicate_request_mismatch", "Import request ID already exists in source history")
             claims = [dict(r) for r in store.db.execute("SELECT * FROM claims WHERE session_id IS NOT NULL")]
             store.db.execute("UPDATE claims SET session_id=NULL,generation=generation+1,updated_at=?", (now(),))
             store.db.execute("UPDATE sessions SET active=0")
@@ -261,11 +271,12 @@ def import_package(args, data):
                               "export_id": manifest["export_id"], "released_claims": claims, "new_instance_id": local["instance_id"]}),
                               "migration", None, now(), "[]", data["request_id"]))
             store.db.execute("UPDATE project SET revision=revision+1,updated_at=?", (now(),))
-            store.db.commit()
-            integrity(store.db)
             result = {"project_id": project["project_id"], "instance_id": local["instance_id"], "event_id": event_id,
                       "revision": project["revision"] + 1, "request_id": data["request_id"],
                       "released_claims": len(claims), "unmapped_resources": manifest.get("external_resources", [])}
+            store.db.execute("INSERT INTO requests VALUES (?,?,?)", (data["request_id"], fp, canonical(result)))
+            store.db.commit()
+            integrity(store.db)
         finally:
             store.close()
         write_json(staging / ".relay/import-receipt.json", {"request_id": data["request_id"], "fingerprint": fp, "result": result})
